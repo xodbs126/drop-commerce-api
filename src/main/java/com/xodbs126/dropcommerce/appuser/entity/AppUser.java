@@ -1,4 +1,4 @@
-package com.xodbs126.dropcommerce.appUser.entity;
+package com.xodbs126.dropcommerce.appuser.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
