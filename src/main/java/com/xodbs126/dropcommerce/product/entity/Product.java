@@ -34,7 +34,7 @@ public class Product {
 
     private LocalDateTime deletedAt;
 
-    public Product(Store store, String name, String description, Integer price, ProductCategory category) {
+    public Product(Store store, String name, String description, int price, ProductCategory category) {
         this.store = store;
         this.name = name;
         this.description = description;
