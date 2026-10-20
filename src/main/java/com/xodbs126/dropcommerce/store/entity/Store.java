@@ -20,4 +20,9 @@ public class Store {
     private Long ownerAppUserId;
 
     private String name;
+
+    public Store(Long ownerAppUserId, String name) {
+        this.ownerAppUserId = ownerAppUserId;
+        this.name = name;
+    }
 }
