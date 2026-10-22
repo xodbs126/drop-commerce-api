@@ -1,10 +1,8 @@
 package com.xodbs126.dropcommerce;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class DropCommerceApiApplicationTests {
+class DropCommerceApiApplicationTests extends IntegrationTest{
 
 	@Test
 	void contextLoads() {
