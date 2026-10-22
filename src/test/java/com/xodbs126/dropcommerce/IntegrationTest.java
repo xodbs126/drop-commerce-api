@@ -22,8 +22,8 @@ public abstract class IntegrationTest {
 
     @BeforeEach
     public void cleanUp() throws SQLException {
-        try (Connection con = dataSource.getConnection()) {
-            Statement st = con.createStatement();
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement()) {
 
             st.execute("SET FOREIGN_KEY_CHECKS = 0");
             try{
