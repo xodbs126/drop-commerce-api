@@ -1,6 +1,5 @@
 package com.xodbs126.dropcommerce;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +16,4 @@ public class TestcontainersConfig {
                 .withEnv("TZ", "Asia/Seoul");
     }
 
-    @BeforeEach
-    public void before() {
-
-    }
 }
