@@ -31,6 +31,8 @@ public class ProductDrop {
 
     private LocalDateTime endAt;
 
+    private LocalDateTime approvedAt;
+
     @Enumerated(EnumType.STRING)
     private DropStatus status;
 
