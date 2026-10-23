@@ -1,5 +1,6 @@
 package com.xodbs126.dropcommerce;
 
+import com.xodbs126.dropcommerce.appuser.entity.AppUser;
 import com.xodbs126.dropcommerce.product.entity.Product;
 import com.xodbs126.dropcommerce.product.entity.ProductCategory;
 import com.xodbs126.dropcommerce.productdrop.entity.ProductDrop;
@@ -32,11 +33,11 @@ public class EntityInsertTest extends IntegrationTest {
 
     @Test
     public void saveStoreApplication() {
-        jdbcTemplate.update("INSERT INTO app_user () VALUES ()");
 
-        Long appUserId = 1L;
+        AppUser user = new AppUser("test1", "password1");
+        em.persist(user);
 
-        em.persist(new StoreApplication(appUserId, "test1", "testDescription1", now()));
+        em.persist(new StoreApplication(user.getId(), "test1", "testDescription1", now()));
 
         StoreApplication storeApplication = em.find(StoreApplication.class,1L);
 
@@ -46,10 +47,10 @@ public class EntityInsertTest extends IntegrationTest {
 
     @Test
     public void saveProduct() {
-        jdbcTemplate.update("INSERT INTO app_user () VALUES ()"); // user 저장
-        Long appUserId = 1L;
+        AppUser user = new AppUser("test1", "password1");
+        em.persist(user);
 
-        em.persist(new Store(appUserId, "test1"));
+        em.persist(new Store(user.getId(), "test1"));
         Store store = em.find(Store.class, 1L);
         em.persist(new Product(store, "test1", "test2", 10000, ProductCategory.BOOK));
 
@@ -60,10 +61,10 @@ public class EntityInsertTest extends IntegrationTest {
 
     @Test
     public void saveProductDrop() {
-        jdbcTemplate.update("INSERT INTO app_user () VALUES ()"); // user 저장
-        Long appUserId = 1L;
+        AppUser user = new AppUser("test1", "password1");
+        em.persist(user);
 
-        em.persist(new Store(appUserId, "test1"));
+        em.persist(new Store(user.getId(), "test1"));
         Store store = em.find(Store.class, 1L);
         em.persist(new Product(store, "test1", "test2", 10000, ProductCategory.BOOK));
         Product product = em.find(Product.class, 1L);
