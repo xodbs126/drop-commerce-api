@@ -32,11 +32,11 @@ public class AppUserService {
         try {
             appUserRepository.save(appUser);
         } catch (DataIntegrityViolationException e) {
-            if (e.getCause() instanceof ConstraintViolationException cve                 // ①
-                    && USERNAME_UNIQUE_CONSTRAINT.equals(cve.getConstraintName())) {     // ②
-                throw new AppUserException(USERNAME_DUPLICATED,e);                      // ③
+            if (e.getCause() instanceof ConstraintViolationException cve
+                    && USERNAME_UNIQUE_CONSTRAINT.equals(cve.getConstraintName())) {
+                throw new AppUserException(USERNAME_DUPLICATED,e);
             }
-            throw e;                                                                     // ④
+            throw e;
         }
 
     }
