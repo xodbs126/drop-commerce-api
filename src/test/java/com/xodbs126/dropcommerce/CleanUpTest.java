@@ -25,7 +25,11 @@ class CleanUpTest extends IntegrationTest {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM app_user", Integer.class);
         assertThat(count).isZero();
 
-        jdbcTemplate.update("INSERT INTO app_user () VALUES ()");
+        jdbcTemplate.update(
+                "INSERT INTO app_user (username, password) VALUES (?, ?)",
+                "test1",
+                "test2"
+        );
 
         Long id = jdbcTemplate.queryForObject("SELECT id FROM app_user", Long.class);
         assertThat(id).isEqualTo(1L);
