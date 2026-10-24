@@ -34,7 +34,7 @@ public class AppUserService {
         } catch (DataIntegrityViolationException e) {
             if (e.getCause() instanceof ConstraintViolationException cve
                     && USERNAME_UNIQUE_CONSTRAINT.equals(cve.getConstraintName())) {
-                throw new AppUserException(USERNAME_DUPLICATED,e);
+                throw new AppUserException(USERNAME_DUPLICATED, e);
             }
             throw e;
         }
