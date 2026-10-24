@@ -2,6 +2,7 @@ package com.xodbs126.dropcommerce.global.exception;
 
 
 import com.xodbs126.dropcommerce.global.exception.dto.FailResponseDto;
+import com.xodbs126.dropcommerce.global.exception.errorcode.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

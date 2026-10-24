@@ -1,5 +1,6 @@
 package com.xodbs126.dropcommerce.global.exception;
 
+import com.xodbs126.dropcommerce.global.exception.errorcode.ErrorCode;
 import lombok.Getter;
 
 @Getter
