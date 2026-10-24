@@ -1,6 +1,6 @@
 package com.xodbs126.dropcommerce.appuser.exception;
 
-import com.xodbs126.dropcommerce.global.exception.ErrorCode;
+import com.xodbs126.dropcommerce.global.exception.errorcode.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
