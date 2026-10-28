@@ -19,9 +19,10 @@ import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.USERN
 @Service
 public class AppUserService {
 
+    private static final String USERNAME_UNIQUE_CONSTRAINT = "uk_app_user_username";
+
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final String USERNAME_UNIQUE_CONSTRAINT = "uk_app_user_username";
 
     public void register(AppUserRegisterRequestDto requestDto) {
         String username = requestDto.username();
