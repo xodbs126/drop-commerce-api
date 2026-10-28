@@ -7,6 +7,7 @@ import com.xodbs126.dropcommerce.global.exception.dto.InvalidInputFailResponseDt
 import com.xodbs126.dropcommerce.global.exception.errorcode.CommonErrorCode;
 import com.xodbs126.dropcommerce.global.exception.errorcode.ErrorCode;
 import com.xodbs126.dropcommerce.global.exception.errorcode.Reason;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -56,7 +58,10 @@ public class GlobalExceptionHandler {
             case "NotNull" -> Reason.REQUIRED;
             case "Size" -> Reason.OUT_OF_RANGE;
             case "Pattern" -> Reason.INVALID_FORMAT;
-            default -> Reason.INVALID_VALUE;
+            default -> {
+                log.warn("reason 번역표에 없는 제약: {}", constraint);
+                yield Reason.INVALID_VALUE;
+            }
         };
     }
 }
