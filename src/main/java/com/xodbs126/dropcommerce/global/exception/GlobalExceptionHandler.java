@@ -58,6 +58,5 @@ public class GlobalExceptionHandler {
             case "Pattern" -> Reason.INVALID_FORMAT;
             default -> Reason.INVALID_VALUE;
         };
-}
-
+    }
 }
