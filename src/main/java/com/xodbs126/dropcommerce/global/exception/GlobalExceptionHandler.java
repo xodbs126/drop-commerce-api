@@ -18,7 +18,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(GlobalException.class)
-    public ResponseEntity<FailResponseDto> handle(GlobalException e) {
+    public ResponseEntity<FailResponseDto> handleGlobalException(GlobalException e) {
 
         ErrorCode errorCode = e.getErrorCode();
 
