@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.*;
+import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.USERNAME_DUPLICATED;
 
 @Transactional
 @RequiredArgsConstructor
