@@ -12,6 +12,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -54,7 +56,24 @@ public class AppUserRegisterTest extends IntegrationTest {
 
         assertThat(appUserRepository.count()).isEqualTo(1L);
 
+    }
 
+    @Test
+    public void requestNullUsernameAndPassword() throws Exception {
+        //given, when
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                }
+                                """))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
+                .andExpect(jsonPath("$.errors", hasSize(2)))
+                .andExpect(jsonPath("$.errors[?(@.field == 'username')].reason", hasItem("REQUIRED")))
+                .andExpect(jsonPath("$.errors[?(@.field == 'password')].reason", hasItem("REQUIRED")));
     }
 
 }
