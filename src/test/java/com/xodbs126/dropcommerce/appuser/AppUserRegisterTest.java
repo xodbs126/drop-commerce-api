@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,6 +33,9 @@ public class AppUserRegisterTest extends IntegrationTest {
     MockMvc mockMvc;
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     public void saveDuplicatedUsername() throws Exception {
@@ -74,6 +78,33 @@ public class AppUserRegisterTest extends IntegrationTest {
                 .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors[?(@.field == 'username')].reason", hasItem("REQUIRED")))
                 .andExpect(jsonPath("$.errors[?(@.field == 'password')].reason", hasItem("REQUIRED")));
+    }
+
+    @Test
+    public void checkPasswordAndRegisterSuccess() throws Exception{
+
+        //when
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                "username" : "testuser1",
+                                "password" : "testuser1"
+                                }
+                                """))
+                .andDo(print())
+                //then
+                .andExpect(status().isCreated());
+
+        long count = appUserRepository.count();
+        assertThat(count).isEqualTo(1);
+
+        AppUser findAppUser = appUserRepository.findAll().getFirst();
+
+        assertThat(findAppUser.getPassword()).isNotEqualTo("testuser1");
+
+        assertThat(passwordEncoder.matches("testuser1", findAppUser.getPassword())).isTrue();
+
     }
 
 }
