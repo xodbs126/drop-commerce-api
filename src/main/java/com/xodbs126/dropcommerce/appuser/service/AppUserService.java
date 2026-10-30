@@ -11,17 +11,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.*;
+import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.USERNAME_DUPLICATED;
 
 @Transactional
 @RequiredArgsConstructor
 @Service
 public class AppUserService {
 
+    private static final String USERNAME_UNIQUE_CONSTRAINT = "uk_app_user_username";
+
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final String USERNAME_UNIQUE_CONSTRAINT = "uk_app_user_username";
 
     public void register(AppUserRegisterRequestDto requestDto) {
         String username = requestDto.username();
@@ -34,7 +34,7 @@ public class AppUserService {
         } catch (DataIntegrityViolationException e) {
             if (e.getCause() instanceof ConstraintViolationException cve
                     && USERNAME_UNIQUE_CONSTRAINT.equals(cve.getConstraintName())) {
-                throw new AppUserException(USERNAME_DUPLICATED,e);
+                throw new AppUserException(USERNAME_DUPLICATED, e);
             }
             throw e;
         }

@@ -1,4 +1,4 @@
-package com.xodbs126.dropcommerce.global.exception;
+package com.xodbs126.dropcommerce.global.exception.errorcode;
 
 import org.springframework.http.HttpStatus;
 

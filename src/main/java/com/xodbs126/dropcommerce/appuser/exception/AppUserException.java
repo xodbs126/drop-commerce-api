@@ -1,14 +1,10 @@
 package com.xodbs126.dropcommerce.appuser.exception;
 
-import lombok.Getter;
+import com.xodbs126.dropcommerce.global.exception.GlobalException;
 
-@Getter
-public class AppUserException extends RuntimeException{
+public class AppUserException extends GlobalException {
 
-    private final AppUserErrorCode appUserErrorCode;
-
-    public AppUserException( AppUserErrorCode appUserErrorCode,Throwable cause) {
-        super(appUserErrorCode.getMessage(), cause);
-        this.appUserErrorCode = appUserErrorCode;
+    public AppUserException(AppUserErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
     }
 }
