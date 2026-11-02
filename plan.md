@@ -1,4 +1,78 @@
-# 세션 이어가기 메모 — 최신 시작점 (11/02 로그인 구현 3번까지)
+# 세션 이어가기 메모 — 최신 시작점 (11/02 로그인 구현 5번까지)
+
+> 새 세션의 AI에게: 아래 `(지난 기록)` 이하는 **지난 기록**이다. 다시 묻지 말 것. 기준은 노션.
+> plan.md는 PC 초기화 전에 보존하려고 사용자 요청으로 `feat/user-login`에 커밋함. **PR 전에 지울지 사용자에게 물을 것.**
+
+- 레포: `feat/user-login`. 로컬 커밋 5개, **origin에 push 안 함**. 작업 트리 깨끗. `compileJava` 통과, 기존 테스트 10건 통과 + 1건 skipped (로그인 테스트는 아직 없음)
+    - `984a64f` fix 빈 값 400 · `eb25eb5` refactor Optional 반환 타입 · `1e8408b` refactor 공백 · `2a9877b` feat 로그인 서비스 · `17d2ab0` feat POST /login 컨트롤러
+- 로드맵: F-12 "진행 중" (https://app.notion.com/3fe3fff1d30881a1b886c3f6e3437228)
+- 복습 질문: 11/01 사용자 결정대로 먼저 내지 말 것
+- git 작성자 설정은 이 레포에 로컬로 넣어 둠 (`xodbs126` / `wlsghks@jnu.ac.kr`)
+
+## 구현 4·5번에서 정한 것 (다시 묻지 말 것)
+
+| 항목 | 결정 | 근거 |
+|---|---|---|
+| "빈 값" 범위 | `""`와 공백만 있는 값 모두 400 | 사용자. 이유는 세 번째에 통과: 빈 값은 DB 조회 전에 형식으로 거부되니 공격자가 얻는 계정 정보가 없음 |
+| 검증 어노테이션 | `@NotBlank` (`@NotNull`은 덮여서 제거) | 사용자가 먼저 제안 |
+| 번역표 | `case "NotBlank" -> Reason.REQUIRED;` | 사용자가 양쪽 칸을 채워 맞춤. 안 넣으면 `INVALID_VALUE` + WARN |
+| 레포지토리 반환 타입 | `Optional<AppUser>` | 사용자. `null`은 타입이 허락하는 값이라 깜빡해도 컴파일됨 → 500 |
+| 꺼내는 방법 | `orElseThrow(() -> ...)` | `try`/`catch`는 범위가 넓어 다른 원인의 예외까지 401로 위장 |
+| 예외 생성자 | `AppUserException(AppUserErrorCode)` 추가, 인자 타입은 **좁은 쪽**으로 통일 | 사용자. 다른 도메인 코드가 섞이면 실수 유발 |
+| 서비스 선언 | `@Transactional(readOnly = true) public Long login(AppUserLoginRequestDto)` | 사용자. 조회만 함. `long`도 가능하다는 건 짚었고 바꾸지 않음 |
+| 컨트롤러 인자 | `HttpServletRequest` | 세션 고정을 막기로 해서 `changeSessionId()`가 필요. `HttpSession`으로는 불가 |
+| 세션 고정 | **이번 브랜치에서 막음.** 세션이 있을 때만 `changeSessionId()` | AI가 권했고 사용자가 고름. 세션이 없으면 `IllegalStateException` → 500 |
+| 핸들러 순서 | 서비스 검증 → (세션 있으면) ID 재발급 → 세션에 회원 `id` → 204 | 먼저 세션을 만들면 실패 요청마다 세션이 쌓임 |
+| 세션 키 상수 | 컨트롤러에 `private static final String SESSION_KEY_APP_USER_ID = "appUserId"` | 사용자. 필터 만들 때 공용 자리로 옮기기로 함 |
+| 커밋 분리 | 성격별로 나눔 (fix / refactor / feat) | 사용자: "성격이 다른 변경이니까" |
+
+- 컨트롤러 `login` 본문은 사용자가 "코드 보여줘"라고 해서 ④ 규칙대로 AI가 줬고, 사용자가 반영함. 그 외 자바 코드는 사용자가 직접 씀
+- AI가 직접 손댄 것: `AppUserErrorCode`의 `),;` 쉼표 제거, `AppUserController` 공백·필드 순서·선언 줄바꿈 (전부 서식)
+
+## 다음 시작: 구현 6번 테스트 5건
+
+- 테스트는 사용자 결정으로 **새 세션에서** 시작함. 기존 `AppUserRegisterTest`를 본보기로 쓸 것
+- 사용자는 테스트 코드가 입문 수준이다. 힌트는 단계적으로
+
+| 번호 | 요청 | 확인할 것 |
+|---|---|---|
+| ① | 맞는 아이디·비밀번호 | 204, 응답에 `Set-Cookie` |
+| ② | 없는 username | 401 `LOGIN_FAILED` |
+| ③ | 틀린 비밀번호 | 401 `LOGIN_FAILED`, ②와 같은 본문 |
+| ④ | 빈 값 | 400 `INVALID_INPUT`, `errors`에 `REQUIRED` |
+| ⑤ | 세션이 있는 상태로 재로그인 | 204, `Set-Cookie`의 세션 ID가 이전 값과 다름 |
+
+- 그다음: origin에 push → PR (PR 전에 plan.md 지울지 묻기) → 필터 또는 인터셉터 → 인가
+- 이번 범위에서 뺌: Origin 필터 · `SameSite=Lax` · 로그인 확인 필터/인터셉터 · 관리자 칸
+
+## 확인할 것 (재현 안 함, 구현 6번에서 확인 가능)
+
+- `@NotBlank`가 실제로 400을 만들고 `errors`의 `reason`이 `REQUIRED`로 오는지
+- `HttpSession`을 인자로 받기만 해도 `Set-Cookie`가 붙는지 (서블릿 규격·Spring 코드로만 따짐)
+- `changeSessionId()` 뒤에 새 `Set-Cookie`가 나가고 값이 바뀌는지
+- `readOnly = true`의 플러시 생략을 쿼리 로그로, 읽기 전용 플래그를 MariaDB 드라이버가 어떻게 다루는지
+- 없는 username이면 해시 비교를 건너뛰어 응답 시간으로 구분되는지 (측정 안 함)
+- `Supplier` 지연 평가 수치: AI가 프로젝트 밖 임시 파일에서 100만 번 620.2ms 대 3.6ms를 쟀음. 예외 쪽에 `getStackTrace()` 비용이 섞여 있어 **면접에서 숫자를 쓰려면 직접 다시 재야 함**
+
+## 이번 세션 습관
+
+- 틀린 답: 이유가 결론 반복("공백만 있는 값은 빈값이기에 400") / 새 이유가 모든 로그인 실패에 해당 / `Set-Cookie` 방향 반대("서버에다가 인지시킨다") / 요청과 응답 혼동 / `changeSessionId`를 `session`에 부르고 회원 `id`를 인자로 넘김
+- 칸 빠짐: 이유 칸("컴파일 때 걸러줌"만) / 지적 네 개 중 세 개만 고치고 "지우라는 걸 못 읽었다"
+- 일반론 손해: "비효율적이다" · "시간 낭비"
+- 잘한 것: 모르면 바로 모른다고 말함 / AI 단정을 의심해 `javac` 확인으로 이어짐 / `readOnly`·`Optional` 선택이 정확 / 세션 고정 장면에서 사칭 가능성을 스스로 짚음 / 커밋을 성격별로 나눔
+- AI가 고칠 것: 장면·응답 없이 "누가 어떤 손해를 보나요"만 물어 사용자가 "너무 대충대충 던진다"고 함 → 장면·응답·예시 답 형태를 갖추면 바로 답함 / 스테이징 전에 다시 확인하지 않아 이미 지운 미사용 import를 또 물음 / 노션에 쓸 때 한글을 유니코드 이스케이프로 넣다가 글자가 여러 번 깨짐 → **한글은 그대로 입력할 것**
+
+## 노션 (11/02 구현 4·5번 반영)
+
+- `[복습]` 하위 페이지 7~11과 Q15~Q22: https://app.notion.com/p/40b3fff1d30881b0a937d3569dfd9313
+    - 7 빈 값 400 · 8 Optional과 Supplier · 9 readOnly · 10 세션을 다루는 자리 · 11 세션 고정
+- 회고 3주차 7일차 (흐름 16~23, 막힌 것·부족했던 것·배운 것 추가): https://app.notion.com/p/40c3fff1d308814cbc8ec1eddc5236cd
+- 로드맵 F-12: 메모·지금 상태·진행 순서·대기 중인 질문(해결)·리뷰 지적(완료)·확인할 것
+- 3주 회고는 아직 안 함
+
+---
+
+# (지난 기록) 세션 이어가기 메모 (11/02 로그인 구현 3번까지)
 
 > 새 세션의 AI에게: 아래 11/02 CSRF 이하 내용은 **지난 기록**이다. 다시 묻지 말 것. 기준은 노션.
 > plan.md는 PC 초기화 전에 보존하려고 사용자 요청으로 `feat/user-login`에 커밋함. **PR 전에 지울지 사용자에게 물을 것.** 이어받은 PC에서 `git switch feat/user-login` 후 읽을 것.
