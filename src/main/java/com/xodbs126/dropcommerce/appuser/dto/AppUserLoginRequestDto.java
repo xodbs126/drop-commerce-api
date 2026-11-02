@@ -1,6 +1,6 @@
 package com.xodbs126.dropcommerce.appuser.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-public record AppUserLoginRequestDto(@NotNull String username, @NotNull String password) {
+public record AppUserLoginRequestDto(@NotBlank String username, @NotBlank String password) {
 }
