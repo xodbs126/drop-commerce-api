@@ -1,5 +1,6 @@
 package com.xodbs126.dropcommerce.appuser.service;
 
+import com.xodbs126.dropcommerce.appuser.dto.AppUserLoginRequestDto;
 import com.xodbs126.dropcommerce.appuser.dto.AppUserRegisterRequestDto;
 import com.xodbs126.dropcommerce.appuser.entity.AppUser;
 import com.xodbs126.dropcommerce.appuser.exception.AppUserException;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.LOGIN_FAILED;
 import static com.xodbs126.dropcommerce.appuser.exception.AppUserErrorCode.USERNAME_DUPLICATED;
 
 @Transactional
@@ -39,5 +41,20 @@ public class AppUserService {
             throw e;
         }
 
+    }
+
+    @Transactional(readOnly = true)
+    public Long login(AppUserLoginRequestDto appUserLoginRequestDto) {
+
+        String username = appUserLoginRequestDto.username();
+
+        AppUser loginUser = appUserRepository.findAppUserByUsername(username)
+                .orElseThrow(() -> new AppUserException(LOGIN_FAILED));
+
+        if (passwordEncoder.matches(appUserLoginRequestDto.password(), loginUser.getPassword())) {
+            return loginUser.getId();
+        } else {
+            throw new AppUserException(LOGIN_FAILED);
+        }
     }
 }

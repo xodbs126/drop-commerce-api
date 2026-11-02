@@ -7,4 +7,8 @@ public class AppUserException extends GlobalException {
     public AppUserException(AppUserErrorCode errorCode, Throwable cause) {
         super(errorCode, cause);
     }
+
+    public AppUserException(AppUserErrorCode errorCode) {
+        super(errorCode);
+    }
 }
