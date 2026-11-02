@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum AppUserErrorCode implements ErrorCode {
 
-    USERNAME_DUPLICATED(HttpStatus.CONFLICT, "USERNAME_DUPLICATED", "이미 존재하는 아이디입니다.");
+    USERNAME_DUPLICATED(HttpStatus.CONFLICT, "USERNAME_DUPLICATED", "이미 존재하는 아이디입니다."),
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "LOGIN_FAILED", "로그인에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -56,6 +56,7 @@ public class GlobalExceptionHandler {
     private Reason toReason(String constraint) {
         return switch (constraint) {
             case "NotNull" -> Reason.REQUIRED;
+            case "NotBlank" -> Reason.REQUIRED;
             case "Size" -> Reason.OUT_OF_RANGE;
             case "Pattern" -> Reason.INVALID_FORMAT;
             default -> {
