@@ -9,6 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class AppUserLoginTest extends ServerIntegrationTest {
 
@@ -88,4 +92,29 @@ public class AppUserLoginTest extends ServerIntegrationTest {
                 .jsonPath("$.message").isEqualTo("로그인에 실패했습니다.");
 
     }
+
+    @Test
+    public void loginBlankUsernameAndPassword() {
+        //given: 저장 안 함. @Valid에서 막혀 DB까지 가지 않음
+
+        //when
+        restTestClient.post()
+                .uri("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                          {
+                          "username" : "",
+                          "password" : ""
+                          }
+                        """)
+                .exchange()
+                //then
+                .expectStatus().isBadRequest()
+                .expectBody().consumeWith(System.out::println)
+                .jsonPath("$.code").isEqualTo("INVALID_INPUT")
+                .jsonPath("$.errors[*].field").value((List<String> fields) ->
+                        assertThat(fields).containsExactlyInAnyOrder("username", "password"))
+                .jsonPath("$.errors[*].reason").isEqualTo(List.of("REQUIRED", "REQUIRED"));
+    }
+
 }
