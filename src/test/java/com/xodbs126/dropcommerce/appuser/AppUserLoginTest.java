@@ -63,4 +63,29 @@ public class AppUserLoginTest extends ServerIntegrationTest {
                 .jsonPath("$.code").isEqualTo("LOGIN_FAILED")
                 .jsonPath("$.message").isEqualTo("로그인에 실패했습니다.");
     }
+
+    @Test
+    public void loginWrongPassword() {
+        //given
+        // matches는 DB값을 BCrypt 해시로 보고 비교하므로, 평문으로 저장하면 비밀번호가 맞아도 인증에 실패한다 → 이 테스트가 틀린 비밀번호를 제대로 검증해서 401이 나는지 검사하지 못한다.
+        appUserRepository.save(new AppUser("testuser123", passwordEncoder.encode("testuser123")));
+
+        //when
+        restTestClient.post()
+                .uri("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                        "username" : "testuser123",
+                        "password" : "testuser1234"
+                        }
+                      """)
+                .exchange()
+                //then
+                .expectStatus().isUnauthorized()
+                .expectBody().consumeWith(System.out::println)
+                .jsonPath("$.code").isEqualTo("LOGIN_FAILED")
+                .jsonPath("$.message").isEqualTo("로그인에 실패했습니다.");
+
+    }
 }
