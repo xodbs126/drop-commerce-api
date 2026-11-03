@@ -42,4 +42,25 @@ public class AppUserLoginTest extends ServerIntegrationTest {
                 .expectHeader().valueMatches("Set-Cookie", "JSESSIONID=.*");
 
     }
+
+    @Test
+    public void loginNoUsernameInDB() {
+        //given when
+        restTestClient.post()
+                .uri("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("""
+                        {
+                        "username" : "testuser123",
+                        "password" : "testuser123"
+                        }
+                        """)
+                .exchange()
+                //then
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.code").isEqualTo("LOGIN_FAILED")
+                .jsonPath("$.message").isEqualTo("로그인에 실패했습니다.");
+    }
 }
