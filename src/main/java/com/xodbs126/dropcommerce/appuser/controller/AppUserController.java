@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.xodbs126.dropcommerce.global.session.SessionConst.SESSION_KEY_APP_USER_ID;
+
 @RestController
 @RequiredArgsConstructor
 public class AppUserController {
-
-    private static final String SESSION_KEY_APP_USER_ID = "appUserId";
 
     private final AppUserService appUserService;
 
