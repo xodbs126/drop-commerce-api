@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
