@@ -11,4 +11,9 @@ public class LoginCheckTestController {
     public ResponseEntity<Void> auth() {
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<Void> adminAccess() {
+        return ResponseEntity.noContent().build();
+    }
 }
