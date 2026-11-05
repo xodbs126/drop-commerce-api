@@ -18,9 +18,14 @@ public class AppUser {
 
     private String username;
     private String password;
+    private boolean isAdmin;
 
     public AppUser(String username, String encodedPassword) {
         this.username = username;
         this.password = encodedPassword;
+    }
+
+    public void promoteToAdmin() {
+        this.isAdmin = true;
     }
 }
