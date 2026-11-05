@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class LoginInterceptorConfig implements WebMvcConfigurer {
 
     private final LoginInterceptor loginInterceptor;
-    private final String[] excludePatterns = {"/users", "/login", "/drops", "/drops/*"};
+    private final String[] excludePatterns = {"/users", "/login", "/error", "/drops", "/drops/*"};
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
