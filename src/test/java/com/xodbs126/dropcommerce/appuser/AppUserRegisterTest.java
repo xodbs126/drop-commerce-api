@@ -53,6 +53,7 @@ public class AppUserRegisterTest extends IntegrationTest {
 
         //when
         mockMvc.perform(post("/users")
+                        .header("Origin", "http://localhost:3000")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -73,6 +74,7 @@ public class AppUserRegisterTest extends IntegrationTest {
     public void requestNullUsernameAndPassword() throws Exception {
         //given, when
         mockMvc.perform(post("/users")
+                        .header("Origin", "http://localhost:3000")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -92,6 +94,7 @@ public class AppUserRegisterTest extends IntegrationTest {
 
         //when
         mockMvc.perform(post("/users")
+                        .header("Origin", "http://localhost:3000")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
