@@ -41,6 +41,7 @@ public class AdminInterceptorTest extends ServerIntegrationTest {
         ExchangeResult result = restTestClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Origin", "http://localhost:3000")
                 .body("""
                         {
                         "username" : "testuser123",
@@ -72,6 +73,7 @@ public class AdminInterceptorTest extends ServerIntegrationTest {
 
         ExchangeResult result = restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                             {

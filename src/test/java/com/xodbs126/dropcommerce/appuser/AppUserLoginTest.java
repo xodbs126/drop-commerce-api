@@ -36,6 +36,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
         restTestClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Origin", "http://localhost:3000")
                 .body("""
                         {
                         "username" : "testuser123",
@@ -55,6 +56,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
         restTestClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Origin", "http://localhost:3000")
                 .body("""
                         {
                         "username" : "testuser123",
@@ -80,6 +82,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
         restTestClient.post()
                 .uri("/login")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Origin", "http://localhost:3000")
                 .body("""
                         {
                         "username" : "testuser123",
@@ -102,6 +105,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
         //when
         restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                           {
@@ -127,6 +131,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
         // 첫 로그인으로 세션을 만들고, 그 세션 ID를 꺼내 둔다
         ExchangeResult firstResult = restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                           {
@@ -146,6 +151,7 @@ public class AppUserLoginTest extends ServerIntegrationTest {
                 .uri("/login")
                 // 첫 세션 ID를 실어야 서버가 기존 세션을 찾아 changeSessionId()를 실행한다 (안 실으면 그냥 새 세션이라 ID가 늘 다름)
                 .cookie("JSESSIONID", firstJSESSIONID)
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                           {

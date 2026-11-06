@@ -41,6 +41,7 @@ public class LoginInterceptorTest extends ServerIntegrationTest {
 
         ExchangeResult result = restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
@@ -84,6 +85,7 @@ public class LoginInterceptorTest extends ServerIntegrationTest {
         //when
         restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("")
                 .exchange()
@@ -98,6 +100,7 @@ public class LoginInterceptorTest extends ServerIntegrationTest {
         //when
         restTestClient.post()
                 .uri("/login")
+                .header("Origin", "http://localhost:3000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body("""
                         {
