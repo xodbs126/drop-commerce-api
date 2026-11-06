@@ -46,7 +46,8 @@ public class AppUserLoginTest extends ServerIntegrationTest {
                 .exchange()
                 //then
                 .expectStatus().isNoContent()
-                .expectHeader().valueMatches("Set-Cookie", "JSESSIONID=.*");
+                .expectHeader().valueMatches("Set-Cookie", "JSESSIONID=.*")
+                .expectHeader().valueMatches("Set-Cookie", "(?i).*SameSite=Lax.*");
 
     }
 
