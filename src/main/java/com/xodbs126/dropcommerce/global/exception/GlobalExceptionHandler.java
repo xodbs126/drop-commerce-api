@@ -59,6 +59,7 @@ public class GlobalExceptionHandler {
             case "NotBlank" -> Reason.REQUIRED;
             case "Size" -> Reason.OUT_OF_RANGE;
             case "Pattern" -> Reason.INVALID_FORMAT;
+            case "Positive" -> Reason.MUST_BE_POSITIVE;
             default -> {
                 log.warn("reason 번역표에 없는 제약: {}", constraint);
                 yield Reason.INVALID_VALUE;
