@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -140,6 +142,27 @@ public class ProductDetailTest extends IntegrationTest {
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("STORE_NOT_FOUND"));
+    }
+
+    @Test
+    public void getProductWithDeletedProduct() throws Exception {
+        //given
+        AppUser savedUser = saveAppUser();
+        Store savedStore = saveStore(savedUser);
+        Product product = saveProduct(savedStore);
+        LocalDateTime time = LocalDateTime.now();
+
+        jdbcTemplate.update("UPDATE product SET deleted_at = ? WHERE id = ?", time, product.getId());
+
+        MockHttpSession session = login();
+
+        //when
+        mockMvc.perform(get("/stores/me/products/{productId}", product.getId())
+                        .session(session))
+                //then
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("PRODUCT_NOT_FOUND"));
     }
 
     private Product saveProduct(Store savedStore) {
