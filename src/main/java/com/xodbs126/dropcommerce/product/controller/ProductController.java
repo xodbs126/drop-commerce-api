@@ -1,5 +1,6 @@
 package com.xodbs126.dropcommerce.product.controller;
 
+import com.xodbs126.dropcommerce.product.dto.ProductDetailResponseDto;
 import com.xodbs126.dropcommerce.product.dto.ProductRegisterRequestDto;
 import com.xodbs126.dropcommerce.product.dto.ProductRegisterResponseDto;
 import com.xodbs126.dropcommerce.product.service.ProductService;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,5 +34,15 @@ public class ProductController {
         Long productId = productService.register(registerRequestDto, appUserId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ProductRegisterResponseDto(productId));
+    }
+
+    @GetMapping("/stores/me/products/{productId}")
+    public ResponseEntity<ProductDetailResponseDto> getProductDetail(HttpServletRequest request, @PathVariable Long productId) {
+        HttpSession session = request.getSession(false);
+        Long appUserId = (Long) session.getAttribute(SESSION_KEY_APP_USER_ID);
+
+        ProductDetailResponseDto responseDto = productService.getProduct(appUserId, productId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }
