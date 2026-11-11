@@ -126,17 +126,12 @@ public class ProductDetailTest extends IntegrationTest {
     @Test
     public void getProductWithoutStore() throws Exception {
         //given
-        AppUser savedUser = saveAppUser();
-        AppUser anotherUser = appUserRepository.save(new AppUser("anotherUser123", passwordEncoder.encode("anotherUser123")));
-
-        Store anotherStore = saveStore(anotherUser);
-
-        Product product = saveProduct(anotherStore);
+        saveAppUser();
 
         MockHttpSession session = login();
 
         //when
-        mockMvc.perform(get("/stores/me/products/{productId}", product.getId())
+        mockMvc.perform(get("/stores/me/products/{productId}", 999L)
                         .session(session))
                 //then
                 .andDo(print())
