@@ -1,6 +1,8 @@
 package com.xodbs126.dropcommerce.product.controller;
 
 import com.xodbs126.dropcommerce.product.dto.ProductDetailResponseDto;
+import com.xodbs126.dropcommerce.product.dto.ProductListRequestDto;
+import com.xodbs126.dropcommerce.product.dto.ProductListResponseDto;
 import com.xodbs126.dropcommerce.product.dto.ProductRegisterRequestDto;
 import com.xodbs126.dropcommerce.product.dto.ProductRegisterResponseDto;
 import com.xodbs126.dropcommerce.product.service.ProductService;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +45,18 @@ public class ProductController {
         Long appUserId = (Long) session.getAttribute(SESSION_KEY_APP_USER_ID);
 
         ProductDetailResponseDto responseDto = productService.getProduct(appUserId, productId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/stores/me/products")
+    public ResponseEntity<ProductListResponseDto> getProductList(
+            HttpServletRequest request,
+            @ModelAttribute @Valid ProductListRequestDto requestDto) {
+        HttpSession session = request.getSession(false);
+        Long appUserId = (Long) session.getAttribute(SESSION_KEY_APP_USER_ID);
+
+        ProductListResponseDto responseDto = productService.getProductList(appUserId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
