@@ -1,10 +1,10 @@
 package com.xodbs126.dropcommerce.product.controller;
 
-import com.xodbs126.dropcommerce.product.dto.ProductDetailResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListRequestDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductRegisterRequestDto;
-import com.xodbs126.dropcommerce.product.dto.ProductRegisterResponseDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductListRequestDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductRegisterRequestDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductDetailResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductListResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductRegisterResponseDto;
 import com.xodbs126.dropcommerce.product.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

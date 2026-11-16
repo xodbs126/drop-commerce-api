@@ -1,9 +1,9 @@
 package com.xodbs126.dropcommerce.product.service;
 
-import com.xodbs126.dropcommerce.product.dto.ProductDetailResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListRequestDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductRegisterRequestDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductListRequestDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductRegisterRequestDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductDetailResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductListResponseDto;
 import com.xodbs126.dropcommerce.product.entity.Product;
 import com.xodbs126.dropcommerce.product.exception.ProductException;
 import com.xodbs126.dropcommerce.product.repository.ProductRepository;
