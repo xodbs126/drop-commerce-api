@@ -55,13 +55,11 @@ public class GlobalExceptionHandler {
 
     private Reason toReason(String constraint) {
         return switch (constraint) {
-            case "NotNull" -> Reason.REQUIRED;
-            case "NotBlank" -> Reason.REQUIRED;
-            case "Size" -> Reason.OUT_OF_RANGE;
+            case "NotNull", "NotBlank" -> Reason.REQUIRED;
             case "Pattern" -> Reason.INVALID_FORMAT;
             case "Positive" -> Reason.MUST_BE_POSITIVE;
-            case "Max" -> Reason.OUT_OF_RANGE;
-            case "Min" -> Reason.OUT_OF_RANGE;
+            case "Max", "Min", "Size" -> Reason.OUT_OF_RANGE;
+            case "NonZero" -> Reason.INVALID_VALUE;
             default -> {
                 log.warn("reason 번역표에 없는 제약: {}", constraint);
                 yield Reason.INVALID_VALUE;

@@ -1,10 +1,12 @@
 package com.xodbs126.dropcommerce.product.controller;
 
-import com.xodbs126.dropcommerce.product.dto.ProductDetailResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListRequestDto;
-import com.xodbs126.dropcommerce.product.dto.ProductListResponseDto;
-import com.xodbs126.dropcommerce.product.dto.ProductRegisterRequestDto;
-import com.xodbs126.dropcommerce.product.dto.ProductRegisterResponseDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductListRequestDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductRegisterRequestDto;
+import com.xodbs126.dropcommerce.product.dto.request.ProductUpdateStockRequestDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductDetailResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductListResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductRegisterResponseDto;
+import com.xodbs126.dropcommerce.product.dto.response.ProductUpdateStockResponseDto;
 import com.xodbs126.dropcommerce.product.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +60,20 @@ public class ProductController {
         Long appUserId = (Long) session.getAttribute(SESSION_KEY_APP_USER_ID);
 
         ProductListResponseDto responseDto = productService.getProductList(appUserId, requestDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/stores/me/products/{productId}/stock")
+    public ResponseEntity<ProductUpdateStockResponseDto> updateProductStock(
+            HttpServletRequest request,
+            @Valid @RequestBody ProductUpdateStockRequestDto requestDto,
+            @PathVariable Long productId
+    ) {
+        HttpSession session = request.getSession(false);
+        Long appUserId = (Long) session.getAttribute(SESSION_KEY_APP_USER_ID);
+
+        ProductUpdateStockResponseDto responseDto = productService.updateStock(appUserId, productId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

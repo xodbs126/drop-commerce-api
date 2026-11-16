@@ -1,4 +1,4 @@
-package com.xodbs126.dropcommerce.product.dto;
+package com.xodbs126.dropcommerce.product.dto.response;
 
 import com.xodbs126.dropcommerce.product.entity.Product;
 import com.xodbs126.dropcommerce.product.entity.ProductCategory;

@@ -1,4 +1,4 @@
-package com.xodbs126.dropcommerce.product.dto;
+package com.xodbs126.dropcommerce.product.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
