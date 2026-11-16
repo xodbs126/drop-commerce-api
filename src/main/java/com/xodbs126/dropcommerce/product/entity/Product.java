@@ -1,5 +1,7 @@
 package com.xodbs126.dropcommerce.product.entity;
 
+import com.xodbs126.dropcommerce.product.exception.ProductErrorCode;
+import com.xodbs126.dropcommerce.product.exception.ProductException;
 import com.xodbs126.dropcommerce.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -41,5 +43,12 @@ public class Product {
         this.price = price;
         this.category = category;
         this.stock = 0;
+    }
+
+    public void changeStock(int delta) {
+        if (stock + delta < 0) {
+            throw new ProductException(ProductErrorCode.STOCK_INSUFFICIENT);
+        }
+        this.stock += delta;
     }
 }
