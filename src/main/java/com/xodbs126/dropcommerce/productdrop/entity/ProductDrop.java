@@ -48,4 +48,17 @@ public class ProductDrop {
         this.status = DropStatus.PENDING;
         this.isReturned = false;
     }
+
+    public DropPhase getPhase(LocalDateTime now) {
+        if (this.status == DropStatus.CANCELLED) {
+            return null;
+        }
+        if (now.isBefore(this.startAt)) {
+            return DropPhase.UPCOMING;
+        } else if (now.isBefore(this.endAt)) {
+            return DropPhase.ONGOING;
+        } else {
+            return DropPhase.ENDED;
+        }
+    }
 }
