@@ -374,6 +374,54 @@ public class ProductDropListTest extends IntegrationTest {
                 .andExpect(jsonPath("$.content[0].phase").value("ENDED"));
     }
 
+    @Test
+    public void getProductDropWithCategory() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct1, now.minusMinutes(10), now.plusMinutes(10));
+        ProductDrop savedDrop2 = saveDrop(savedProduct2, now.minusMinutes(10), now.plusMinutes(10));
+        jdbcTemplate.update("UPDATE product SET category = ? WHERE id = ?", "BOOK", savedProduct2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("category", "FOOD"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].category").value("FOOD"));
+    }
+
+    @Test
+    public void getProductDropWithoutCategory() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct1, now.minusMinutes(10), now.plusMinutes(10));
+        ProductDrop savedDrop2 = saveDrop(savedProduct2, now.minusMinutes(10), now.plusMinutes(10));
+        jdbcTemplate.update("UPDATE product SET category = ? WHERE id = ?", "BOOK", savedProduct2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+
+        //when
+        mockMvc.perform(get("/drops"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].category", containsInAnyOrder("FOOD", "BOOK")));
+    }
+
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
         return saveDrop(savedProduct, now.minusMinutes(10), now.plusMinutes(10));
     }
