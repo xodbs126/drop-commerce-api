@@ -17,10 +17,13 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.convention.TestBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -43,12 +46,16 @@ public class ProductDropListTest extends IntegrationTest {
     private ProductDropRepository productDropRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
+    @TestBean
     private Clock clock;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    static Clock clock() {
+        return Clock.fixed(Instant.parse("2026-11-19T02:00:00Z"), ZoneId.of("Asia/Seoul"));
+    }
 
     @Test
     public void getProductDropListWithoutDeletedProduct() throws Exception {
@@ -321,6 +328,50 @@ public class ProductDropListTest extends IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(1))
                 .andExpect(jsonPath("$.content[0].productName").value("testProduct1"));
+    }
+
+    @Test
+    public void getProductDropWithOngoingAtStartBoundary() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct = saveProduct(savedStore, 1);
+
+        ProductDrop drop = saveDrop(savedProduct, now, now.plusMinutes(10));
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", drop.getId());
+
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("phase", "ONGOING"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct1"))
+                .andExpect(jsonPath("$.content[0].phase").value("ONGOING"));
+    }
+
+    @Test
+    public void getProductDropWithEndedAtEndBoundary() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct = saveProduct(savedStore, 1);
+
+        ProductDrop drop = saveDrop(savedProduct, now.minusMinutes(10), now);
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", drop.getId());
+
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("phase", "ENDED"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct1"))
+                .andExpect(jsonPath("$.content[0].phase").value("ENDED"));
     }
 
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
