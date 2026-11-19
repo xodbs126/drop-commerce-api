@@ -30,6 +30,7 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
                         phaseCondition(condition.phase(), condition.now()),
                         categoryCondition(condition.category()),
                         keywordCondition(condition.keyword()))
+                .orderBy(productDrop.startAt.asc(), productDrop.id.asc())
                 .fetch();
     }
 
