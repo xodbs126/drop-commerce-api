@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @TestPropertySource(properties = {
@@ -524,6 +525,60 @@ public class ProductDropListTest extends IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(1))
                 .andExpect(jsonPath("$.content[0].productName").value(savedDrop1.getProduct().getName()));
+    }
+
+    @Test
+    public void getProductDropListOrderByStartAt() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct1, now.plusMinutes(20), now.plusMinutes(30));
+        ProductDrop savedDrop2 = saveDrop(savedProduct2, now, now.plusMinutes(30));
+        ProductDrop savedDrop3 = saveDrop(savedProduct3, now.plusMinutes(10), now.plusMinutes(30));
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+
+        //when
+        mockMvc.perform(get("/drops"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(3))
+                .andExpect(jsonPath("$.content[*].productName",
+                        contains("testProduct2", "testProduct3", "testProduct1")));
+    }
+
+    @Test
+    public void getProductDropListOrderByIdWhenSameStartAt() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct3, now, now.plusMinutes(30));
+        ProductDrop savedDrop2 = saveDrop(savedProduct1, now, now.plusMinutes(30));
+        ProductDrop savedDrop3 = saveDrop(savedProduct2, now, now.plusMinutes(30));
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+
+        //when
+        mockMvc.perform(get("/drops"))
+                .andDo(print())
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(3))
+                .andExpect(jsonPath("$.content[*].productName",
+                        contains("testProduct3", "testProduct1", "testProduct2")));
     }
 
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
