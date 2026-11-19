@@ -27,7 +27,7 @@ public class ProductDropController {
     }
 
     @GetMapping("/drops")
-    public ResponseEntity<ProductDropListResponseDto> getProductDropDto(@ModelAttribute @Valid ProductDropSearchRequestDto requestDto) {
+    public ResponseEntity<ProductDropListResponseDto> getProductDropList(@ModelAttribute @Valid ProductDropSearchRequestDto requestDto) {
         ProductDropListResponseDto responseDtos = productDropService.getProductDropList(requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);

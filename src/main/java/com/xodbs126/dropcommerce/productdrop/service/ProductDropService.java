@@ -36,9 +36,10 @@ public class ProductDropService {
     @Transactional(readOnly = true)
     public ProductDropListResponseDto getProductDropList(ProductDropSearchRequestDto requestDto) {
         LocalDateTime now = LocalDateTime.now(clock);
-        ProductDropSearchCondition con = new ProductDropSearchCondition(requestDto.keyword(), requestDto.category(), requestDto.phase(), now);
-        List<ProductDrop> productDropList = productDropRepository.search(con);
+        ProductDropSearchCondition condition = new ProductDropSearchCondition(requestDto.keyword(), requestDto.category(), requestDto.phase(), now);
+        List<ProductDrop> productDropList = productDropRepository.search(condition);
 
+        // TODO: 3단계 Slice 도입 시 hasNext 계산 (현재 page·size 미적용)
         return new ProductDropListResponseDto(productDropList, now, requestDto.page(), requestDto.size(), false);
     }
 

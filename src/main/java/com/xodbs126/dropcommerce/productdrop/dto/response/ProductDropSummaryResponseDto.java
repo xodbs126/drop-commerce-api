@@ -4,7 +4,6 @@ import com.xodbs126.dropcommerce.product.entity.ProductCategory;
 import com.xodbs126.dropcommerce.productdrop.entity.DropPhase;
 import com.xodbs126.dropcommerce.productdrop.entity.DropStatus;
 import com.xodbs126.dropcommerce.productdrop.entity.ProductDrop;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
