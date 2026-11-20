@@ -1,5 +1,6 @@
 package com.xodbs126.dropcommerce.productdrop.repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.xodbs126.dropcommerce.product.entity.ProductCategory;
@@ -33,7 +34,7 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
                         phaseCondition(condition.phase(), condition.now()),
                         categoryCondition(condition.category()),
                         keywordCondition(condition.keyword()))
-                .orderBy(productDrop.startAt.asc(), productDrop.id.asc())
+                .orderBy(sortCondition(condition.phase()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -45,6 +46,13 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    private OrderSpecifier<?>[] sortCondition(DropPhase phase) {
+        if (phase == DropPhase.ENDED)
+            return new OrderSpecifier<?>[]{productDrop.startAt.desc(), productDrop.id.asc()};
+
+        return new OrderSpecifier<?>[]{productDrop.startAt.asc(), productDrop.id.asc()};
     }
 
     private BooleanExpression keywordCondition(String keyword) {
