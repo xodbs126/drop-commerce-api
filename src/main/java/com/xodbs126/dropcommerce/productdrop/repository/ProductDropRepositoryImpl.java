@@ -2,6 +2,7 @@ package com.xodbs126.dropcommerce.productdrop.repository;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.xodbs126.dropcommerce.product.entity.ProductCategory;
 import com.xodbs126.dropcommerce.productdrop.entity.DropPhase;
@@ -26,7 +27,7 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<ProductDrop> search(ProductDropSearchCondition condition, Pageable pageable) {
+    public Slice<ProductDrop> search(ProductDropSearchCondition condition, ProductDropSort sort, Pageable pageable) {
         List<ProductDrop> content = jpaQueryFactory.selectFrom(productDrop)
                 .join(productDrop.product, product)
                 .join(product.store, store)
@@ -34,7 +35,7 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
                         phaseCondition(condition.phase(), condition.now()),
                         categoryCondition(condition.category()),
                         keywordCondition(condition.keyword()))
-                .orderBy(sortCondition(condition.phase()))
+                .orderBy(sortCondition(sort))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -48,11 +49,16 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    private OrderSpecifier<?>[] sortCondition(DropPhase phase) {
-        if (phase == DropPhase.ENDED)
-            return new OrderSpecifier<?>[]{productDrop.startAt.desc(), productDrop.id.asc()};
+    private OrderSpecifier<?>[] sortCondition(ProductDropSort sort) {
+        ComparableExpressionBase<?> column = switch (sort.field()) {
+            case PRICE -> product.price;
+            case START_AT -> productDrop.startAt;
+            case LIMITED_QUANTITY -> productDrop.limitedQuantity;
+            case REMAINING_QUANTITY -> productDrop.remainingQuantity;
+        };
+        OrderSpecifier<?> order = sort.direction().isAscending() ? column.asc() : column.desc();
 
-        return new OrderSpecifier<?>[]{productDrop.startAt.asc(), productDrop.id.asc()};
+        return new OrderSpecifier<?>[]{order, productDrop.id.asc()};
     }
 
     private BooleanExpression keywordCondition(String keyword) {

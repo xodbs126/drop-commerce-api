@@ -5,5 +5,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface ProductDropRepositoryCustom {
-    Slice<ProductDrop> search(ProductDropSearchCondition condition, Pageable pageable);
+    Slice<ProductDrop> search(ProductDropSearchCondition condition, ProductDropSort sort, Pageable pageable);
 }
