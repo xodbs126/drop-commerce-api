@@ -25,11 +25,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @TestPropertySource(properties = {
         "logging.level.org.hibernate.SQL=debug"
@@ -579,6 +578,98 @@ public class ProductDropListTest extends IntegrationTest {
                 .andExpect(jsonPath("$.content.size()").value(3))
                 .andExpect(jsonPath("$.content[*].productName",
                         contains("testProduct3", "testProduct1", "testProduct2")));
+    }
+
+    @Test
+    public void getProductDropWithHasNext() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+        Product savedProduct4 = saveProduct(savedStore, 4);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct3, now, now.plusMinutes(60));
+        ProductDrop savedDrop2 = saveDrop(savedProduct1, now.plusMinutes(10), now.plusMinutes(60));
+        ProductDrop savedDrop3 = saveDrop(savedProduct2, now.plusMinutes(20), now.plusMinutes(60));
+        ProductDrop savedDrop4 = saveDrop(savedProduct4, now.plusMinutes(30), now.plusMinutes(60));
+
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop4.getId());
+
+        mockMvc.perform(get("/drops")
+                        .param("page", "0")
+                        .param("size", "2"))
+                .andDo(print())
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct3"))
+                .andExpect(jsonPath("$.content[1].productName").value("testProduct1"))
+                .andExpect(jsonPath("$.hasNext").value(true))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(2));
+    }
+
+    @Test
+    public void getProductDropWithFit() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+        Product savedProduct4 = saveProduct(savedStore, 4);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct3, now, now.plusMinutes(60));
+        ProductDrop savedDrop2 = saveDrop(savedProduct1, now.plusMinutes(10), now.plusMinutes(60));
+        ProductDrop savedDrop3 = saveDrop(savedProduct2, now.plusMinutes(20), now.plusMinutes(60));
+        ProductDrop savedDrop4 = saveDrop(savedProduct4, now.plusMinutes(30), now.plusMinutes(60));
+
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop4.getId());
+
+        mockMvc.perform(get("/drops")
+                        .param("page", "1")
+                        .param("size", "2"))
+                .andDo(print())
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct2"))
+                .andExpect(jsonPath("$.content[1].productName").value("testProduct4"))
+                .andExpect(jsonPath("$.hasNext").value(false))
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.size").value(2));
+    }
+
+    @Test
+    public void getProductDropWithLastOne() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 1);
+        Product savedProduct2 = saveProduct(savedStore, 2);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct3, now, now.plusMinutes(60));
+        ProductDrop savedDrop2 = saveDrop(savedProduct1, now.plusMinutes(10), now.plusMinutes(60));
+        ProductDrop savedDrop3 = saveDrop(savedProduct2, now.plusMinutes(20), now.plusMinutes(60));
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+
+        mockMvc.perform(get("/drops")
+                        .param("page", "1")
+                        .param("size", "2"))
+                .andDo(print())
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct2"))
+                .andExpect(jsonPath("$.hasNext").value(false));
     }
 
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
