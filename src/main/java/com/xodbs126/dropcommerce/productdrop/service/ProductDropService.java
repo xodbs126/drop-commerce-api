@@ -8,12 +8,14 @@ import com.xodbs126.dropcommerce.productdrop.exception.ProductDropException;
 import com.xodbs126.dropcommerce.productdrop.repository.ProductDropRepository;
 import com.xodbs126.dropcommerce.productdrop.repository.ProductDropSearchCondition;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.xodbs126.dropcommerce.productdrop.exception.ProductDropErrorCode.DROP_NOT_FOUND;
 
@@ -36,11 +38,10 @@ public class ProductDropService {
     @Transactional(readOnly = true)
     public ProductDropListResponseDto getProductDropList(ProductDropSearchRequestDto requestDto) {
         LocalDateTime now = LocalDateTime.now(clock);
+        Pageable pageable = PageRequest.of(requestDto.page(), requestDto.size());
         ProductDropSearchCondition condition = new ProductDropSearchCondition(requestDto.keyword(), requestDto.category(), requestDto.phase(), now);
-        List<ProductDrop> productDropList = productDropRepository.search(condition);
+        Slice<ProductDrop> productDropList = productDropRepository.search(condition, pageable);
 
-        // TODO: 3단계 Slice 도입 시 hasNext 계산 (현재 page·size 미적용)
-        return new ProductDropListResponseDto(productDropList, now, requestDto.page(), requestDto.size(), false);
+        return new ProductDropListResponseDto(productDropList, now);
     }
-
 }

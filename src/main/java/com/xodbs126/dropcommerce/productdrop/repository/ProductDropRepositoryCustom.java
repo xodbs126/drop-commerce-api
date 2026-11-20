@@ -1,9 +1,9 @@
 package com.xodbs126.dropcommerce.productdrop.repository;
 
 import com.xodbs126.dropcommerce.productdrop.entity.ProductDrop;
-
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface ProductDropRepositoryCustom {
-    List<ProductDrop> search(ProductDropSearchCondition condition);
+    Slice<ProductDrop> search(ProductDropSearchCondition condition, Pageable pageable);
 }

@@ -7,6 +7,9 @@ import com.xodbs126.dropcommerce.productdrop.entity.DropPhase;
 import com.xodbs126.dropcommerce.productdrop.entity.DropStatus;
 import com.xodbs126.dropcommerce.productdrop.entity.ProductDrop;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -22,8 +25,8 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<ProductDrop> search(ProductDropSearchCondition condition) {
-        return jpaQueryFactory.selectFrom(productDrop)
+    public Slice<ProductDrop> search(ProductDropSearchCondition condition, Pageable pageable) {
+        List<ProductDrop> content = jpaQueryFactory.selectFrom(productDrop)
                 .join(productDrop.product, product)
                 .join(product.store, store)
                 .where(product.deletedAt.isNull(),
@@ -31,7 +34,17 @@ public class ProductDropRepositoryImpl implements ProductDropRepositoryCustom {
                         categoryCondition(condition.category()),
                         keywordCondition(condition.keyword()))
                 .orderBy(productDrop.startAt.asc(), productDrop.id.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
+
+        boolean hasNext = content.size() > pageable.getPageSize();
+
+        if (hasNext) {
+            content.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     private BooleanExpression keywordCondition(String keyword) {
