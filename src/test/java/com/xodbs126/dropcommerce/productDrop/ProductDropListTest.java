@@ -726,6 +726,34 @@ public class ProductDropListTest extends IntegrationTest {
                         contains("testProduct1", "testProduct2", "testProduct3")));
     }
 
+    @Test
+    public void getProductDropListOrderByPriceAsc() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now(clock);
+        AppUser savedUser = saveUser("testuser123");
+        Store savedStore = saveStore(savedUser, "testStore1");
+        Product savedProduct1 = saveProduct(savedStore, 2);
+        Product savedProduct2 = saveProduct(savedStore, 1);
+        Product savedProduct3 = saveProduct(savedStore, 3);
+
+        ProductDrop savedDrop1 = saveDrop(savedProduct1, now.minusMinutes(60), now.plusMinutes(5));
+        ProductDrop savedDrop2 = saveDrop(savedProduct2, now.minusMinutes(60), now.plusMinutes(5));
+        ProductDrop savedDrop3 = saveDrop(savedProduct3, now.minusMinutes(60), now.plusMinutes(5));
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop1.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop2.getId());
+        jdbcTemplate.update("UPDATE product_drop SET approved_at = ?, status = ? WHERE id = ?", now, "APPROVED", savedDrop3.getId());
+
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("sort", "price,asc"))
+                .andDo(print())
+                //then
+                .andExpect(jsonPath("$.content.size()").value(3))
+                .andExpect(jsonPath("$.content[0].productName").value("testProduct1"))
+                .andExpect(jsonPath("$.content[1].productName").value("testProduct2"))
+                .andExpect(jsonPath("$.content[2].productName").value("testProduct3"));
+    }
+
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
         return saveDrop(savedProduct, now.minusMinutes(10), now.plusMinutes(10));
     }
