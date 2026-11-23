@@ -904,6 +904,54 @@ public class ProductDropListTest extends IntegrationTest {
                 .andExpect(jsonPath("$.content[2].phase").value("ENDED"));
     }
 
+    @Test
+    public void getProductDropWithNoSortArgument() throws Exception {
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("sort", "price"))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
+                .andExpect(jsonPath("$.errors[?(@.field == 'sort')].reason", hasItem("INVALID_FORMAT")));
+    }
+
+    @Test
+    public void getProductDropWithNotAllowedSort() throws Exception {
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("sort", "name,asc"))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
+                .andExpect(jsonPath("$.errors[?(@.field == 'sort')].reason", hasItem("INVALID_FORMAT")));
+    }
+
+    @Test
+    public void getProductDropWithSortUpper() throws Exception {
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("sort", "price,ASC"))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
+                .andExpect(jsonPath("$.errors[?(@.field == 'sort')].reason", hasItem("INVALID_FORMAT")));
+    }
+
+    @Test
+    public void getProductDropWithSortBlank() throws Exception {
+        //when
+        mockMvc.perform(get("/drops")
+                        .param("sort", ""))
+                .andDo(print())
+                //then
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
+                .andExpect(jsonPath("$.errors[?(@.field == 'sort')].reason", hasItem("INVALID_FORMAT")));
+    }
+
     private @NonNull ProductDrop saveDrop(Product savedProduct, LocalDateTime now) {
         return saveDrop(savedProduct, now.minusMinutes(10), now.plusMinutes(10));
     }
