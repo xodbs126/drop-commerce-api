@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ProductDropRepository extends JpaRepository<ProductDrop, Long> {
+public interface ProductDropRepository extends JpaRepository<ProductDrop, Long>, ProductDropRepositoryCustom {
     Optional<ProductDrop> findByIdAndApprovedAtIsNotNull(Long id);
 }
