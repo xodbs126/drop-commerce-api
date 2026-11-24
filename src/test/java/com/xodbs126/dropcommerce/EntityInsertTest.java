@@ -11,17 +11,12 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.xodbs126.dropcommerce.productdrop.entity.DropStatus.PENDING;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-        "logging.level.org.hibernate.SQL=debug",
-        "logging.level.org.hibernate.orm.jdbc.bind=trace"
-})
 @Transactional
 public class EntityInsertTest extends IntegrationTest {
 
