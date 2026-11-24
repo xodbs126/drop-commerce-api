@@ -12,7 +12,7 @@ import java.sql.Statement;
 import java.util.List;
 
 @Import(TestcontainersConfig.class)
-@SpringBootTest
+@SpringBootTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
 public abstract class IntegrationTest {
 
     @Autowired
@@ -26,11 +26,11 @@ public abstract class IntegrationTest {
              Statement st = con.createStatement()) {
 
             st.execute("SET FOREIGN_KEY_CHECKS = 0");
-            try{
+            try {
                 for (String table : TABLES) {
                     st.execute("TRUNCATE TABLE " + table);
                 }
-            }finally {
+            } finally {
                 st.execute("SET FOREIGN_KEY_CHECKS  = 1");
             }
         }
