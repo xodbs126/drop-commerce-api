@@ -129,7 +129,6 @@ public class ProductDropQueryCountTest extends IntegrationTest {
         Store savedStore2 = saveStore(savedUser2, "testStore2");
         Store savedStore3 = saveStore(savedUser3, "testStore3");
 
-
         Product savedProduct1 = saveProduct(savedStore1, 1);
         Product savedProduct2 = saveProduct(savedStore2, 2);
         Product savedProduct3 = saveProduct(savedStore3, 3);
