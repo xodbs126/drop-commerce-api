@@ -45,7 +45,7 @@ public class Product {
         this.stock = 0;
     }
 
-    public void changeStock(int delta) {
+    public void adjustStock(int delta) {
         if (stock + delta < 0) {
             throw new ProductException(ProductErrorCode.STOCK_INSUFFICIENT);
         }

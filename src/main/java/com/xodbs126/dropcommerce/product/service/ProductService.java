@@ -71,7 +71,7 @@ public class ProductService {
         Store findStore = storeService.findByAppUserId(appUserId);
 
         Product product = productRepository.findByIdAndStoreAndDeletedAtIsNull(productId, findStore).orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
-        product.changeStock(requestDto.delta());
+        product.adjustStock(requestDto.delta());
 
         return new ProductUpdateStockResponseDto(product.getId(), product.getStock());
     }

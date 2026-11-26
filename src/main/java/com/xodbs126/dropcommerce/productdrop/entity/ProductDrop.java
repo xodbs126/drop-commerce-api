@@ -1,6 +1,10 @@
 package com.xodbs126.dropcommerce.productdrop.entity;
 
+import com.xodbs126.dropcommerce.global.exception.GlobalException;
+import com.xodbs126.dropcommerce.global.exception.errorcode.CommonErrorCode;
 import com.xodbs126.dropcommerce.product.entity.Product;
+import com.xodbs126.dropcommerce.productdrop.exception.ProductDropErrorCode;
+import com.xodbs126.dropcommerce.productdrop.exception.ProductDropException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,5 +64,18 @@ public class ProductDrop {
         } else {
             return DropPhase.ENDED;
         }
+    }
+
+    public void decreaseRemainingQuantity(int amount, int cumulativeAmount) {
+        if (amount <= 0) {
+            throw new GlobalException(CommonErrorCode.INVALID_INPUT);
+        }
+        if (cumulativeAmount + amount > maxQuantityPerUser) {
+            throw new ProductDropException(ProductDropErrorCode.PURCHASE_LIMIT_EXCEEDED);
+        }
+        if (remainingQuantity - amount < 0) {
+            throw new ProductDropException(ProductDropErrorCode.REMAINING_QUANTITY_INSUFFICIENT);
+        }
+        this.remainingQuantity -= amount;
     }
 }
